@@ -1,0 +1,15 @@
+{% extends 'bootstrap.html' %}
+
+{% block title %}{{puzzle.name}}{% endblock %}
+
+{% block bootstrap4_content %}
+  <div class="container mt-4">
+    <h1>{{puzzle.name}}</h1>
+
+    <blockquote class="blockquote">
+      <p class="mt-4">{{puzzle.question}}</p>
+    </blockquote>
+
+    {% include 'puzzle_form.html' %}
+  </div>
+{% endblock %}
