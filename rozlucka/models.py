@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db.models import (
     BooleanField,
     DateTimeField,
@@ -11,6 +12,13 @@ from django.db.models import (
 
 class Answer(Model):
     text = CharField(max_length=255)
+
+
+class Attempt(Model):
+    puzzle = ForeignKey('Puzzle', on_delete=PROTECT)
+    text = CharField(max_length=255)
+    correct = BooleanField(default=False)
+    created_at = DateTimeField(default=datetime.now)
 
 
 class Puzzle(Model):
