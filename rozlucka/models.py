@@ -13,18 +13,30 @@ from django.db.models import (
 class Answer(Model):
     text = CharField(max_length=255)
 
+    def __str__(self):
+        return self.text
+
 
 class Attempt(Model):
-    puzzle = ForeignKey('Puzzle', on_delete=PROTECT)
+    puzzle = ForeignKey('Puzzle', on_delete=PROTECT, related_name='attempts')
     text = CharField(max_length=255)
     correct = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.now)
+
+    def __str__(self):
+        return '%s, %s' % (self.puzzle, self.created_at)
 
 
 class Puzzle(Model):
     name = CharField(max_length=255)
     question = TextField(max_length=255)
     answer = ForeignKey('Answer', on_delete=PROTECT)
+
+    def __str__(self):
+        return '%s' % self.name
+
+    def is_correct(self):
+        return self.attempts.filter(correct=True).count() > 0
 
 
 class Station(Model):
