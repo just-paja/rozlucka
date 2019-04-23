@@ -15,10 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import PuzzleDetailView, PuzzleSkipView
+from .views import (
+    StationDetailView,
+    StationSkipView,
+    station_visit,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('puzzle/<puzzle_id>/', PuzzleDetailView.as_view(), name='puzzle_detail'),
-    path('puzzle/<puzzle_id>/skip', PuzzleSkipView.as_view(), name='puzzle_skip'),
+    path('station/<station_id>/', StationDetailView.as_view(), name='station_detail'),
+    path('station/<station_id>/skip', StationSkipView.as_view(), name='station_skip'),
+    path('station/<station_id>/visit', station_visit, name='station_visit'),
 ]

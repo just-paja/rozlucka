@@ -1,12 +1,12 @@
 from django.contrib.admin import ModelAdmin, register
-from .models import Answer, Attempt, Puzzle, Station, Game
+from .models import Answer, AnswerAttempt, Puzzle, Station, Game
 
 @register(Answer)
 class AnswerAdmin(ModelAdmin):
     pass
 
-@register(Attempt)
-class AttemptAdmin(ModelAdmin):
+@register(AnswerAttempt)
+class AnswerAttemptAdmin(ModelAdmin):
     pass
 
 @register(Puzzle)

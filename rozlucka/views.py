@@ -1,38 +1,54 @@
 from django.http import Http404
 from django.views.generic import FormView
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .forms import PuzzleForm
-from .models import Puzzle
+from .models import Station
 
 
 class PuzzleView(FormView):
-    def get_puzzle(self):
+    def get_station(self):
         try:
-            return Puzzle.objects.get(pk=self.kwargs['puzzle_id'])
-        except Puzzle.DoesNotExist:
+            return Station.objects.get(pk=self.kwargs['station_id'])
+        except Station.DoesNotExist:
             raise Http404
+
+
+    def get_puzzle(self):
+        return self.get_station().puzzle
 
     def get_context_data(self, **kwargs):
         context = super(PuzzleView, self).get_context_data(**kwargs)
+        context['station'] = self.get_station()
         context['puzzle'] = self.get_puzzle()
-        context['correct'] = context['puzzle'].is_correct()
         return context
 
 
-class PuzzleDetailView(PuzzleView):
+class StationDetailView(PuzzleView):
     template_name = 'puzzle_detail.html'
     form_class = PuzzleForm
 
     def get_success_url(self):
-        puzzle = self.get_puzzle()
-        return reverse('puzzle_detail', kwargs={ 'puzzle_id': puzzle.id })
+        station = self.get_station()
+        return reverse('station_detail', kwargs={ 'station_id': station.id })
 
     def form_valid(self, form):
         form.save(self.get_puzzle())
         return super().form_valid(form)
 
 
-class PuzzleSkipView(PuzzleView):
-    pass
+class StationSkipView(FormView):
+    def get(request):
+        pass
+
+
+def station_visit(request, *args, **kwargs):
+    try:
+        station = Station.objects.get(pk=kwargs['station_id'])
+    except Station.DoesNotExist:
+        raise Http404
+
+    station.visited = True
+    station.save()
+    return redirect(reverse('station_detail', args=[station.id]))

@@ -5,6 +5,7 @@ from django.db.models import (
     ForeignKey,
     CharField,
     Model,
+    CASCADE,
     PROTECT,
     TextField,
 )
@@ -17,11 +18,14 @@ class Answer(Model):
         return self.text
 
 
-class Attempt(Model):
-    puzzle = ForeignKey('Puzzle', on_delete=PROTECT, related_name='attempts')
+class AnswerAttempt(Model):
     text = CharField(max_length=255)
+    puzzle = ForeignKey(
+        'Puzzle',
+        on_delete=CASCADE,
+        related_name='answer_attempts',
+    )
     correct = BooleanField(default=False)
-    created_at = DateTimeField(default=datetime.now)
 
     def __str__(self):
         return '%s, %s' % (self.puzzle, self.created_at)
@@ -35,12 +39,19 @@ class Puzzle(Model):
     def __str__(self):
         return '%s' % self.name
 
-    def is_correct(self):
-        return self.attempts.filter(correct=True).count() > 0
+    def is_answered(self):
+        return self.answer_attempts.filter(correct=True).count() > 0
 
 
 class Station(Model):
-    puzzle = ForeignKey('Puzzle', on_delete=PROTECT)
+    name = CharField(max_length=63)
+    description = TextField()
+    puzzle = ForeignKey(
+        'Puzzle',
+        on_delete=PROTECT,
+        null=True,
+        blank=True,
+    )
     next = ForeignKey(
         'Station',
         related_name='prev',
@@ -50,6 +61,11 @@ class Station(Model):
     )
     visited = BooleanField(default=False)
     skipped = BooleanField(default=False)
+
+    def is_answered(self):
+        if self.puzzle:
+            return self.puzzle.is_answered()
+        return False
 
 
 class Game(Model):

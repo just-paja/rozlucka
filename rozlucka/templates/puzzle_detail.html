@@ -4,12 +4,28 @@
 
 {% block bootstrap4_content %}
   <div class="container mt-4">
-    <h1>{{puzzle.name}}</h1>
+    {% if not station.visited %}
+      <h1>{{station.name}}</h1>
+      <blockquote class="blockquote">
+        {{station.description}}
+      </blockquote>
+    {% elif puzzle.is_answered %}
+      {% if station.next %}
+        <h1>{{station.name}}</h1>
+        <blockquote class="blockquote">
+          {{station.description}}
+        </blockquote>
+      {% else %}
+        <h1>Q'apla!</h1>
+      {% endif %}
+    {% else %}
+      <h1>{{puzzle.name}}</h1>
+      <blockquote class="blockquote">
 
-    <blockquote class="blockquote">
-      <p class="mt-4">{{puzzle.question}}</p>
-    </blockquote>
+        <p class="mt-4">{{puzzle.question}}</p>
+      </blockquote>
 
-    {% include 'puzzle_form.html' %}
+      {% include 'puzzle_form.html' %}
+    {% endif %}
   </div>
 {% endblock %}

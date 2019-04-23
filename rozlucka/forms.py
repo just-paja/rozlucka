@@ -1,6 +1,7 @@
 from django import forms
+from .models import AnswerAttempt
 
-from .models import Attempt, Puzzle
+from .models import AnswerAttempt, Puzzle
 
 class PuzzleForm(forms.Form):
     answer = forms.CharField(
@@ -9,9 +10,10 @@ class PuzzleForm(forms.Form):
     )
 
     def save(self, puzzle):
-        attempt = Attempt(
-            correct=self.cleaned_data['answer'] == puzzle.answer.text,
+        answer = self.cleaned_data['answer']
+        AnswerAttempt.objects.create(
             puzzle=puzzle,
-            text=self.cleaned_data['answer']
+            text=answer,
+            correct=answer == puzzle.answer.text,
         )
         attempt.save()
