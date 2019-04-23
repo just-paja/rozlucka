@@ -11,6 +11,12 @@
       </blockquote>
     {% elif puzzle.is_answered %}
       {% if station.next %}
+        <p class="alert alert-success">
+          Správně! Well played.
+        </p>
+        <p>
+          Přesuň se na další lokaci. Jestli je to možné, vem svého parťáka s sebou.
+        </p>
         <h1>{{station.name}}</h1>
         <blockquote class="blockquote">
           {{station.description}}
@@ -21,11 +27,21 @@
     {% else %}
       <h1>{{puzzle.name}}</h1>
       <blockquote class="blockquote">
-
         <p class="mt-4">{{puzzle.question}}</p>
       </blockquote>
 
       {% include 'puzzle_form.html' %}
+
+      {% if attempts %}
+        <p class="alert alert-danger">
+          Žádná z tvých odpovědí nebyla správná
+        </p>
+        <ul>
+          {% for attempt in attempts %}
+            <li>{{attempt.text}}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     {% endif %}
   </div>
 {% endblock %}

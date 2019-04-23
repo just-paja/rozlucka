@@ -26,6 +26,7 @@ class AnswerAttempt(Model):
         related_name='answer_attempts',
     )
     correct = BooleanField(default=False)
+    created_at = DateTimeField(default=datetime.now)
 
     def __str__(self):
         return '%s, %s' % (self.puzzle, self.created_at)

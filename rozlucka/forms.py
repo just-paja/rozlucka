@@ -1,7 +1,15 @@
+import unidecode
+
 from django import forms
 from .models import AnswerAttempt
 
 from .models import AnswerAttempt, Puzzle
+
+def is_correct(answer, attempt):
+    left = unidecode.unidecode(answer).strip().lower()
+    right = unidecode.unidecode(attempt).strip().lower()
+    print('%s == %s' % (left, right))
+    return left == right
 
 class PuzzleForm(forms.Form):
     answer = forms.CharField(
@@ -14,6 +22,5 @@ class PuzzleForm(forms.Form):
         AnswerAttempt.objects.create(
             puzzle=puzzle,
             text=answer,
-            correct=answer == puzzle.answer.text,
+            correct=is_correct(puzzle.answer.text, answer),
         )
-        attempt.save()
