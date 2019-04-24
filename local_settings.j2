@@ -1,0 +1,20 @@
+{% if lookup('env', 'DEBUG') %}
+DEBUG = True
+{% endif %}
+{% if lookup('env', 'ALLOWED_HOSTS') %}
+ALLOWED_HOSTS = '{{lookup('env', 'ALLOWED_HOSTS')}}'.split(' ')
+{% endif %}
+{% if lookup('env', 'SECRET_KEY') %}
+SECRET_KEY = '{{lookup('env', 'SECRET_KEY')}}'
+{% endif %}
+{% if lookup('env', 'DB_NAME') %}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '{{lookup('env', 'DB_NAME')}}',
+        'USER': '{{lookup('env', 'DB_USER')}}',
+        'PASSWORD': '{{lookup('env', 'DB_PASSWORD')}}',
+        'HOST': '{{lookup('env', 'DB_HOST')}}',
+    },
+}
+{% endif %}

@@ -1,0 +1,127 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+
+workspace_root: &workspace_root
+  ~/repo
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/python:3.7
+
+version: 2
+jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "Pipfile.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv .venv
+            . .venv/bin/activate
+            pip install pipenv vrun
+            pipenv install --dev
+            pipenv check
+
+      - save_cache:
+          paths:
+            - ./.venv
+          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .
+
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: *workspace_root
+
+      - run:
+          name: Lock requirements
+          command: ./.venv/bin/vrun pipenv lock --requirements > requirements.txt
+
+      - run:
+          name: Compile artifacts
+          command: ./.venv/bin/vrun python setup.py sdist
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .
+
+  deploy-to-production:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: *workspace_root
+      - add_ssh_keys:
+          fingerprints:
+            - "47:1c:8b:3d:98:f9:c0:1c:7c:2d:77:e9:cd:46:da:cf"
+      - run:
+          name: Install ansible requirements
+          command: ./.venv/bin/vrun pipenv run ansible-galaxy install -r requirements-ansible.yml
+      - run:
+          name: Configure ansible inventory
+          command: echo -e "[web]\n${DEPLOY_HOST}" > inventory.yml
+      - run:
+          name: Deploy to Production
+          command: >
+            env
+            PACKAGE_VERSION=$(python -c 'import version; print(version.PACKAGE_VERSION)')
+            ALLOWED_HOSTS="$ALLOWED_HOSTS"
+            DB_HOST="$DB_HOST"
+            DB_NAME="$DB_NAME"
+            DB_PASSWORD="$DB_PASSWORD"
+            DB_USER="$DB_USER"
+            DJANGO_PROJECT_ENVIRONMENT="production"
+            DJANGO_SERVER_NAME="$ALLOWED_HOSTS"
+            EMAIL_MANAGER="$EMAIL_MANAGER"
+            SECRET_KEY="$SECRET_KEY"
+            ./.venv/bin/vrun pipenv run ansible-playbook deploy.yml -i inventory.yml
+
+workflows:
+  version: 2
+  build-n-deploy:
+    jobs:
+      - install:
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+      - build:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+      - test:
+          requires:
+            - install
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+      - deploy-to-staging:
+          requires:
+            - build
+            - test
+          filters:
+            branches:
+              only: master
+      - deploy-to-production:
+          requires:
+            - build
+            - test
+          filters:
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
