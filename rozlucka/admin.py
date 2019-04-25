@@ -3,19 +3,37 @@ from .models import Answer, AnswerAttempt, Puzzle, Station, Game
 
 @register(Answer)
 class AnswerAdmin(ModelAdmin):
-    pass
+    list_display = (
+        'text',
+        'puzzle',
+    )
 
 @register(AnswerAttempt)
 class AnswerAttemptAdmin(ModelAdmin):
-    pass
+    list_display = (
+        'id',
+        'puzzle',
+        'text',
+        'created_at',
+    )
 
 @register(Puzzle)
 class PuzzleAdmin(ModelAdmin):
-    pass
+    list_display = (
+        'name',
+        'is_answered',
+    )
 
 @register(Station)
 class StationAdmin(ModelAdmin):
-    pass
+    list_display = (
+        'name',
+        'puzzle',
+        'is_answered',
+        'visited',
+        'skipped',
+        'next'
+    )
 
 @register(Game)
 class GameAdmin(ModelAdmin):

@@ -1,3 +1,5 @@
+import unidecode
+
 from datetime import datetime
 from django.db.models import (
     BooleanField,
@@ -13,6 +15,12 @@ from django.db.models import (
 
 class Answer(Model):
     text = CharField(max_length=255)
+    puzzle = ForeignKey(
+        'Puzzle',
+        on_delete=CASCADE,
+        related_name='answers',
+        null=True,
+    )
 
     def __str__(self):
         return self.text
@@ -31,17 +39,27 @@ class AnswerAttempt(Model):
     def __str__(self):
         return '%s, %s' % (self.puzzle, self.created_at)
 
+def is_answer_correct(answer, attempt):
+    left = unidecode.unidecode(answer).strip().lower()
+    right = unidecode.unidecode(attempt).strip().lower()
+    return left == right
+
 
 class Puzzle(Model):
     name = CharField(max_length=255)
     question = TextField(max_length=255)
-    answer = ForeignKey('Answer', on_delete=PROTECT)
 
     def __str__(self):
         return '%s' % self.name
 
     def is_answered(self):
         return self.answer_attempts.filter(correct=True).count() > 0
+
+    def is_correct(self, answer):
+        for puzzle_answer in self.answers.all():
+            if is_answer_correct(puzzle_answer.text, answer):
+                return True
+        return False
 
 
 class Station(Model):
@@ -63,9 +81,27 @@ class Station(Model):
     visited = BooleanField(default=False)
     skipped = BooleanField(default=False)
 
+    def __str__(self):
+        return self.name
+
     def is_answered(self):
         if self.puzzle:
             return self.puzzle.is_answered()
+        return False
+
+    def is_active(self):
+        # is not skipped
+        # station before is answered and not skipped
+        # station before before is skipped
+        if self.skipped:
+            return False
+
+        if self.is_answered():
+            return True
+
+        if not self.prev.first() or self.prev.first().is_answered():
+            return True
+
         return False
 
 

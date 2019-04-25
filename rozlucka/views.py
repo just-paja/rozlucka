@@ -15,6 +15,21 @@ class PuzzleView(FormView):
             raise Http404
 
 
+    def get_status(self):
+        puzzle = self.get_puzzle()
+        station = self.get_station()
+        if not puzzle:
+            return 'no-puzzle'
+        if puzzle.is_answered():
+            return 'answered'
+            return 'active'
+        return None
+
+    def get(self, *args, **kwargs):
+        if not self.get_station().is_active():
+            raise Http404
+        return super(PuzzleView, self).get(*args, **kwargs)
+
     def get_puzzle(self):
         return self.get_station().puzzle
 

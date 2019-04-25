@@ -4,12 +4,7 @@
 
 {% block bootstrap4_content %}
   <div class="container mt-4">
-    {% if not station.visited %}
-      <h1>{{station.name}}</h1>
-      <blockquote class="blockquote">
-        {{station.description}}
-      </blockquote>
-    {% elif puzzle.is_answered %}
+    {% if puzzle.is_answered %}
       {% if station.next %}
         <p class="alert alert-success">
           Správně! Well played.
@@ -17,20 +12,20 @@
         <p>
           Přesuň se na další lokaci. Jestli je to možné, vem svého parťáka s sebou.
         </p>
-        <h1>{{station.name}}</h1>
-        <blockquote class="blockquote">
-          {{station.description}}
-        </blockquote>
+        {% include 'station_summary.html' with station=station.next %}
       {% else %}
         <h1>Q'apla!</h1>
       {% endif %}
     {% else %}
-      <h1>{{puzzle.name}}</h1>
-      <blockquote class="blockquote">
-        <p class="mt-4">{{puzzle.question}}</p>
-      </blockquote>
+      {% include 'station_summary.html' with station=station %}
+      {% if puzzle %}
+        <h2>{{puzzle.name}}</h2>
+        <blockquote class="blockquote">
+          <p class="mt-4">{{puzzle.question}}</p>
+        </blockquote>
 
-      {% include 'puzzle_form.html' %}
+        {% include 'puzzle_form.html' %}
+      {% endif %}
 
       {% if attempts %}
         <p class="alert alert-danger">
