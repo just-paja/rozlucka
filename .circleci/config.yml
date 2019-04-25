@@ -59,6 +59,23 @@ jobs:
           paths:
             - .
 
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: *workspace_root
+
+      - run:
+          name: Static code analysis
+          command: ./.venv/bin/vrun pipenv run prospector
+
+      - run:
+          name: Tests
+          command: ./.venv/bin/vrun pipenv run pytest --junitxml=/tmp/junit-test-report.xml --cov-config=.coveragerc --cov="."
+
+      - store_test_results:
+          path: /tmp/junit-test-report.xml
+
   deploy-to-production:
     <<: *defaults
     steps:
@@ -93,35 +110,17 @@ workflows:
   version: 2
   build-n-deploy:
     jobs:
-      - install:
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+      - install
       - build:
           requires:
             - install
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
       - test:
           requires:
             - install
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-      - deploy-to-staging:
+      - deploy-to-production:
           requires:
             - build
             - test
           filters:
             branches:
               only: master
-      - deploy-to-production:
-          requires:
-            - build
-            - test
-          filters:
-            tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
