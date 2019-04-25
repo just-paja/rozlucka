@@ -1,6 +1,6 @@
 from django.http import Http404
 from django.views.generic import FormView
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from .forms import PuzzleForm
@@ -24,8 +24,8 @@ class PuzzleView(FormView):
         context['puzzle'] = context['station'].puzzle
         context['attempts'] = (
             context['puzzle'].answer_attempts
-                .order_by('-created_at')
-                .all()
+            .order_by('-created_at')
+            .all()
         )
         return context
 
@@ -36,7 +36,7 @@ class StationDetailView(PuzzleView):
 
     def get_success_url(self):
         station = self.get_station()
-        return reverse('station_detail', kwargs={ 'station_id': station.id })
+        return reverse('station_detail', kwargs={'station_id': station.id})
 
     def form_valid(self, form):
         form.save(self.get_puzzle())
@@ -44,8 +44,7 @@ class StationDetailView(PuzzleView):
 
 
 class StationSkipView(FormView):
-    def get(request):
-        pass
+    pass
 
 
 def station_visit(request, *args, **kwargs):

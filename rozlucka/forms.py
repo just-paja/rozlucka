@@ -1,9 +1,8 @@
 import unidecode
 
 from django import forms
-from .models import AnswerAttempt
 
-from .models import AnswerAttempt, Puzzle
+from .models import AnswerAttempt
 
 def is_correct(answer, attempt):
     left = unidecode.unidecode(answer).strip().lower()
