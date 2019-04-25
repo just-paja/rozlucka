@@ -4,10 +4,10 @@
   vars:
     django_archive: dist/rozlucka-{{ lookup("env", "PACKAGE_VERSION") }}.tar.gz
     django_config_file: local_settings.j2
-    django_config: api.settings
+    django_config: rozlucka.settings
     django_project_name: 'cz-zak-global-rozlucka'
     django_project_environment: '{{ lookup("env", "DJANGO_PROJECT_ENVIRONMENT") }}'
-    django_wsgi_file: api/wsgi.py
+    django_wsgi_file: rozlucka/wsgi.py
 
   roles:
     - role: practical-ansible.nginx-django
