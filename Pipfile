@@ -13,6 +13,7 @@ django = "*"
 django-bootstrap4 = "*"
 unidecode = "*"
 ansible = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.7"
