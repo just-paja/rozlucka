@@ -22,11 +22,14 @@ class PuzzleView(FormView):
         context = super(PuzzleView, self).get_context_data(**kwargs)
         context['station'] = self.get_station()
         context['puzzle'] = context['station'].puzzle
-        context['attempts'] = (
-            context['puzzle'].answer_attempts
-            .order_by('-created_at')
-            .all()
-        )
+        if context['puzzle']:
+            context['attempts'] = (
+                context['puzzle'].answer_attempts
+                .order_by('-created_at')
+                .all()
+            )
+        else:
+            context['attempts'] = []
         return context
 
 
