@@ -23,3 +23,6 @@ class PuzzleForm(forms.Form):
             text=answer,
             correct=is_correct(puzzle.answer.text, answer),
         )
+
+class StationSkipForm(form.Form):
+    pass

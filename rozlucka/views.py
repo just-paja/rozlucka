@@ -3,7 +3,7 @@ from django.views.generic import FormView
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from .forms import PuzzleForm
+from .forms import PuzzleForm, StationSkipForm
 from .models import Station
 
 
@@ -47,7 +47,7 @@ class StationDetailView(PuzzleView):
 
 
 class StationSkipView(FormView):
-    pass
+    form_class = StationSkipForm
 
 
 def station_visit(request, *args, **kwargs):
