@@ -69,13 +69,6 @@ jobs:
           name: Static code analysis
           command: ./.venv/bin/vrun pipenv run prospector
 
-      - run:
-          name: Tests
-          command: ./.venv/bin/vrun pipenv run pytest --junitxml=/tmp/junit-test-report.xml --cov-config=.coveragerc --cov="."
-
-      - store_test_results:
-          path: /tmp/junit-test-report.xml
-
   deploy-to-production:
     <<: *defaults
     steps:
