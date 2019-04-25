@@ -1,5 +1,12 @@
 from django.contrib.admin import ModelAdmin, register
-from .models import Answer, AnswerAttempt, Puzzle, Station, Game
+from .models import (
+    Answer,
+    AnswerAttempt,
+    Puzzle,
+    Station,
+    StationFacilitator,
+    StationFacilitatorGuess,
+)
 
 @register(Answer)
 class AnswerAdmin(ModelAdmin):
@@ -24,6 +31,21 @@ class PuzzleAdmin(ModelAdmin):
         'is_answered',
     )
 
+@register(StationFacilitator)
+class StationFacilitatorAdmin(ModelAdmin):
+    list_display = (
+        'name',
+        'station',
+    )
+
+@register(StationFacilitatorGuess)
+class StationFacilitatorGuessAdmin(ModelAdmin):
+    list_display = (
+        'text',
+        'station',
+        'correct',
+    )
+
 @register(Station)
 class StationAdmin(ModelAdmin):
     list_display = (
@@ -34,7 +56,3 @@ class StationAdmin(ModelAdmin):
         'skipped',
         'next'
     )
-
-@register(Game)
-class GameAdmin(ModelAdmin):
-    pass

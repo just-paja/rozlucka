@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import (
+    StationUnlockView,
     StationDetailView,
     StationSkipView,
     station_visit,
@@ -23,7 +24,8 @@ from .views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('station/<station_id>/', StationDetailView.as_view(), name='station_detail'),
+    path('station/<station_id>/', StationUnlockView.as_view(), name='station_unlock'),
+    path('station/<station_id>/puzzle', StationDetailView.as_view(), name='station_detail'),
     path('station/<station_id>/skip', StationSkipView.as_view(), name='station_skip'),
     path('station/<station_id>/visit', station_visit, name='station_visit'),
 ]

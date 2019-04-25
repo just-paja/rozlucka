@@ -1,0 +1,10 @@
+{% if attempts %}
+  <p class="alert alert-danger">
+    Žádná z tvých odpovědí nebyla správná
+  </p>
+  <ul>
+    {% for attempt in attempts %}
+      <li>{{attempt.text}}</li>
+    {% endfor %}
+  </ul>
+{% endif %}

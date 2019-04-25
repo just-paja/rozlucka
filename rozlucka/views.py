@@ -3,7 +3,7 @@ from django.views.generic import FormView
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from .forms import PuzzleForm, StationSkipForm
+from .forms import PuzzleForm, StationSkipForm, UnlockForm
 from .models import Station
 
 
@@ -14,21 +14,10 @@ class PuzzleView(FormView):
         except Station.DoesNotExist:
             raise Http404
 
-
-    def get_status(self):
-        puzzle = self.get_puzzle()
-        station = self.get_station()
-        if not puzzle:
-            return 'no-puzzle'
-        if puzzle.is_answered():
-            return 'answered'
-            return 'active'
-        return None
-
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         if not self.get_station().is_active():
             raise Http404
-        return super(PuzzleView, self).get(*args, **kwargs)
+        return super(PuzzleView, self).get(request, *args, **kwargs)
 
     def get_puzzle(self):
         return self.get_station().puzzle
@@ -48,9 +37,42 @@ class PuzzleView(FormView):
         return context
 
 
+class StationUnlockView(PuzzleView):
+    template_name = 'station_unlock.html'
+    form_class = UnlockForm
+
+    def get(self, request, *args, **kwargs):
+        station = self.get_station()
+        if station.is_unlocked():
+            return redirect(reverse('station_detail', kwargs={'station_id': station.id}))
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['guesses'] = ctx['station'].facilitator_guesses.all()
+        return ctx
+
+    def get_success_url(self):
+        station = self.get_station()
+        target = 'station_unlock'
+        if station.is_unlocked():
+            target = 'station_detail'
+        return reverse(target, kwargs={'station_id': station.id})
+
+    def form_valid(self, form):
+        form.save(self.get_station())
+        return super().form_valid(form)
+
+
 class StationDetailView(PuzzleView):
     template_name = 'puzzle_detail.html'
     form_class = PuzzleForm
+
+    def get(self, request, *args, **kwargs):
+        station = self.get_station()
+        if not station.is_unlocked():
+            return redirect(reverse('station_unlock', kwargs={'station_id': station.id}))
+        return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
         station = self.get_station()

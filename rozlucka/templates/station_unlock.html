@@ -1,0 +1,14 @@
+{% extends 'bootstrap.html' %}
+
+{% block title %}{{puzzle.name}}{% endblock %}
+
+{% block bootstrap4_content %}
+  <div class="container mt-4">
+    {% include 'station_summary.html' with station=station %}
+    <h2>Zamčeno!</h2>
+    <p>Toto místo je zamčené. Odemkneš ho tím, že napíšeš správně jméno člověka, který ji hlídá.</p>
+
+    {% include 'unlock_form.html' %}
+    {% include 'attempt_list.html' with attempts=guesses %}
+  </div>
+{% endblock %}

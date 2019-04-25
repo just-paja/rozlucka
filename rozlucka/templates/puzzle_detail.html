@@ -19,23 +19,9 @@
     {% else %}
       {% include 'station_summary.html' with station=station %}
       {% if puzzle %}
-        <h2>{{puzzle.name}}</h2>
-        <blockquote class="blockquote">
-          <p class="mt-4">{{puzzle.question}}</p>
-        </blockquote>
-
-        {% include 'puzzle_form.html' %}
-      {% endif %}
-
-      {% if attempts %}
-        <p class="alert alert-danger">
-          Žádná z tvých odpovědí nebyla správná
-        </p>
-        <ul>
-          {% for attempt in attempts %}
-            <li>{{attempt.text}}</li>
-          {% endfor %}
-        </ul>
+        {% include 'puzzle.html' %}
+      {% else %}
+        <p>Místo je bez hádanky</p>
       {% endif %}
     {% endif %}
   </div>

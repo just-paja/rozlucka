@@ -1,0 +1,10 @@
+{% if puzzle %}
+  <h2>{{puzzle.name}}</h2>
+  <blockquote class="blockquote">
+    <p class="mt-4">{{puzzle.question}}</p>
+  </blockquote>
+
+  {% include 'puzzle_form.html' %}
+{% endif %}
+
+{% include 'attempt_list.html' %}

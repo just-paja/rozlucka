@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import unidecode
 
-from datetime import datetime
 from django.db.models import (
     BooleanField,
     DateTimeField,
@@ -62,6 +63,25 @@ class Puzzle(Model):
         return False
 
 
+class StationFacilitator(Model):
+    name = CharField(max_length=63)
+    station = ForeignKey(
+        'Station',
+        on_delete=CASCADE,
+        related_name='facilitators'
+    )
+
+
+class StationFacilitatorGuess(Model):
+    text = CharField(max_length=63)
+    station = ForeignKey(
+        'Station',
+        on_delete=CASCADE,
+        related_name='facilitator_guesses',
+    )
+    correct = BooleanField(default=False)
+
+
 class Station(Model):
     name = CharField(max_length=63)
     description = TextField()
@@ -88,6 +108,15 @@ class Station(Model):
         if self.puzzle:
             return self.puzzle.is_answered()
         return False
+
+    def is_facilitator(self, name):
+        for facilitator in self.facilitators.all():
+            if is_answer_correct(facilitator.name, name):
+                return True
+        return False
+
+    def is_unlocked(self):
+        return self.facilitator_guesses.filter(correct=True).count() >= 1
 
     def is_active(self):
         # is not skipped
