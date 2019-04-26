@@ -1,0 +1,23 @@
+{% extends 'bootstrap.html' %}
+
+{% block title %}{{puzzle.name}}{% endblock %}
+
+{% block bootstrap4_content %}
+  <div class="container mt-4">
+    {% if station.skipped %}
+      <p class="alert alert-danger">
+        Tento checkpoint je přeskočený. Přesuň se na další.
+      </p>
+      {% include 'station_summary.html' with station=next %}
+    {% elif station.is_skippable %}
+      {% include 'station_summary.html' with station=station %}
+      <h2>Vážně to chceš vzdát?</h2>
+      <p>Pokud tuto hádanku vzdáš, učiníš jednoho člověka nešťastným, protože úplně přeskočíš jeho checkpoint.</p>
+      {% include 'skip_form.html' %}
+    {% else %}
+      {% include 'station_summary.html' with station=station %}
+      <h2>Tento checkpoint se nedá přeskočit</h2>
+      <p>V případě nouze volej svého operátora</p>
+    {% endif %}
+  </div>
+{% endblock %}

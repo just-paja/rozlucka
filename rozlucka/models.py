@@ -7,6 +7,7 @@ from django.db.models import (
     DateTimeField,
     ForeignKey,
     CharField,
+    Manager,
     Model,
     CASCADE,
     PROTECT,
@@ -82,6 +83,18 @@ class StationFacilitatorGuess(Model):
     correct = BooleanField(default=False)
 
 
+class StationManager(Manager):
+    def next_station(self):
+        station = self.filter(
+            next__isnull=True,
+            visited=False,
+        ).first()
+        while station and station.next:
+            if not station.skipped:
+                station = station.next
+        return station
+
+
 class Station(Model):
     name = CharField(max_length=63)
     description = TextField()
@@ -100,6 +113,7 @@ class Station(Model):
     )
     visited = BooleanField(default=False)
     skipped = BooleanField(default=False)
+    objects = StationManager()
 
     def __str__(self):
         return self.name
@@ -119,19 +133,15 @@ class Station(Model):
         return self.facilitator_guesses.filter(correct=True).count() >= 1
 
     def is_active(self):
-        # is not skipped
-        # station before is answered and not skipped
-        # station before before is skipped
-        if self.skipped:
-            return False
-
         if self.is_answered():
             return True
-
-        if not self.prev.first() or self.prev.first().is_answered():
+        prev = self.prev.first()
+        if not prev or prev.skipped or prev.is_answered():
             return True
-
         return False
+
+    def is_skippable(self):
+        return self.next and self.next.next
 
 
 class Game(Model):

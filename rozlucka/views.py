@@ -43,6 +43,8 @@ class StationUnlockView(PuzzleView):
 
     def get(self, request, *args, **kwargs):
         station = self.get_station()
+        if station.skipped:
+            raise Http404
         if station.is_unlocked():
             return redirect(reverse('station_detail', kwargs={'station_id': station.id}))
         return super().get(request, *args, **kwargs)
@@ -70,6 +72,8 @@ class StationDetailView(PuzzleView):
 
     def get(self, request, *args, **kwargs):
         station = self.get_station()
+        if station.skipped:
+            raise Http404
         if not station.is_unlocked():
             return redirect(reverse('station_unlock', kwargs={'station_id': station.id}))
         return super().get(request, *args, **kwargs)
@@ -83,9 +87,22 @@ class StationDetailView(PuzzleView):
         return super().form_valid(form)
 
 
-class StationSkipView(FormView):
+class StationSkipView(PuzzleView):
     form_class = StationSkipForm
+    template_name = 'station_skip.html'
 
+    def get_success_url(self):
+        station = self.get_station()
+        return reverse('station_skip', kwargs={'station_id': station.id})
+
+    def form_valid(self, form):
+        form.save(self.get_station())
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['next'] = Station.objects.next_station()
+        return context
 
 def station_visit(request, *args, **kwargs):
     try:

@@ -27,7 +27,6 @@ class UnlockForm(forms.Form):
 
     def save(self, station):
         answer = self.cleaned_data['answer']
-        print(answer)
         StationFacilitatorGuess.objects.create(
             station=station,
             text=answer,
@@ -35,4 +34,8 @@ class UnlockForm(forms.Form):
         )
 
 class StationSkipForm(forms.Form):
-    pass
+    def save(self, station):
+        station.skipped = True
+        station.next.skipped = True
+        station.save()
+        station.next.save()
