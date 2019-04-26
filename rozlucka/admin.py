@@ -50,6 +50,7 @@ class StationFacilitatorGuessAdmin(ModelAdmin):
 class StationAdmin(ModelAdmin):
     list_display = (
         'name',
+        'time',
         'puzzle',
         'is_answered',
         'visited',

@@ -12,6 +12,7 @@ from django.db.models import (
     CASCADE,
     PROTECT,
     TextField,
+    TimeField,
 )
 
 
@@ -113,6 +114,7 @@ class Station(Model):
     )
     visited = BooleanField(default=False)
     skipped = BooleanField(default=False)
+    time = TimeField(null=True)
     objects = StationManager()
 
     def __str__(self):
