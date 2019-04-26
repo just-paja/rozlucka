@@ -58,6 +58,9 @@ class Puzzle(Model):
     def is_answered(self):
         return self.answer_attempts.filter(correct=True).count() > 0
 
+    def count_answers(self):
+        return self.answers.count()
+
     def is_correct(self, answer):
         for puzzle_answer in self.answers.all():
             if is_answer_correct(puzzle_answer.text, answer):

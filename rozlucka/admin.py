@@ -28,6 +28,7 @@ class AnswerAttemptAdmin(ModelAdmin):
 class PuzzleAdmin(ModelAdmin):
     list_display = (
         'name',
+        'count_answers',
         'is_answered',
     )
 
