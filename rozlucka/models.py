@@ -99,6 +99,7 @@ class StationManager(Manager):
 class Station(Model):
     name = CharField(max_length=63)
     description = TextField()
+    instructions = TextField(blank=True, null=True)
     puzzle = ForeignKey(
         'Puzzle',
         on_delete=PROTECT,

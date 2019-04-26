@@ -18,6 +18,9 @@
       {% endif %}
     {% else %}
       {% include 'station_summary.html' with station=station %}
+      {% if station.instructions %}
+        <p class="alert alert-info">{{ station.instructions}}</p>
+      {% endif %}
       {% if puzzle %}
         {% include 'puzzle.html' %}
       {% else %}
